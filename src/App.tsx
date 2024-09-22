@@ -109,7 +109,7 @@ export const App: React.FC = () => {
           return newTodos;
         });
       })
-      .catch(() => 'Unable to update a todo')
+      .catch(() => setErrorMessage('Unable to update a todo'))
       .finally(() => setLoading(false));
   };
 
@@ -126,7 +126,7 @@ export const App: React.FC = () => {
           return newTodos;
         });
       })
-      .catch(() => 'Unable to update a todo')
+      .catch(() => setErrorMessage('Unable to update a todo'))
       .finally(() => setLoading(false));
   };
 
@@ -161,7 +161,13 @@ export const App: React.FC = () => {
 
   const handleToggleAll = () => {
     todos.map(todo => {
-      updateTodo(todo);
+      if (!checkEveryCompletedTodos) {
+        if (!todo.completed) {
+          updateTodo(todo);
+        }
+      } else {
+        updateTodo(todo);
+      }
     });
   };
 

@@ -35,6 +35,7 @@ export const TodoItem: React.FC<Props> = ({
   const handleEscBtn = (event: React.KeyboardEvent) => {
     if (event.key === 'Escape') {
       setIsEditing(false);
+      setNewTitle(title);
     }
   };
 
