@@ -6,6 +6,7 @@ import {
   postTodo,
   deleteTodo,
   patchTodo,
+  patchTitleTodo,
 } from './api/todos';
 import { Todo } from './types/Todo';
 import { TodoList } from './Components/TodoList/TodoList';
@@ -112,6 +113,23 @@ export const App: React.FC = () => {
       .finally(() => setLoading(false));
   };
 
+  const updateTitleTodo = (selectedTodo: Todo, newTitle: string) => {
+    setLoading(true);
+    patchTitleTodo(selectedTodo, newTitle)
+      .then(newTodo => {
+        setTodos(currentTodos => {
+          const newTodos = [...currentTodos];
+          const index = newTodos.findIndex(todo => todo.id === selectedTodo.id);
+
+          newTodos.splice(index, 1, newTodo);
+
+          return newTodos;
+        });
+      })
+      .catch(() => 'Unable to update a todo')
+      .finally(() => setLoading(false));
+  };
+
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
 
@@ -173,6 +191,7 @@ export const App: React.FC = () => {
           isLoading={loading}
           tempTodo={tempTodo}
           onUpdate={updateTodo}
+          onUpdateTitle={updateTitleTodo}
         />
         {todos.length !== 0 && (
           <Footer
