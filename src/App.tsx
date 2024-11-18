@@ -24,7 +24,7 @@ export const App: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [errorMessage, setErrorMessage] = useState('');
   const [option, setOption] = useState(SelectOption.All);
-  const [loading, setLoading] = useState(false);
+  const [loadingTodos, setLoadingTodos] = useState<Record<number, boolean>>({});
   const [titleTodo, setTitleTodo] = useState('');
   const [inputTodo, setInputTodo] = useState(true);
   const inputFocus = useRef<HTMLInputElement>(null);
@@ -82,7 +82,7 @@ export const App: React.FC = () => {
 
   const deleteTodos = (todoId: number) => {
     setInputTodo(false);
-    setLoading(true);
+    setLoadingTodos(current => ({ ...current, [todoId]: true }));
     deleteTodo(todoId)
       .then(() =>
         setTodos(currentTodos =>
@@ -92,12 +92,18 @@ export const App: React.FC = () => {
       .catch(() => setErrorMessage('Unable to delete a todo'))
       .finally(() => {
         setInputTodo(true);
-        setLoading(false);
+        setLoadingTodos(current => {
+          const newState = { ...current };
+
+          delete newState[todoId];
+
+          return newState;
+        });
       });
   };
 
   const updateTodo = (selectedTodo: Todo) => {
-    setLoading(true);
+    setLoadingTodos(current => ({ ...current, [selectedTodo.id]: true }));
     patchTodo(selectedTodo)
       .then(newTodo => {
         setTodos(currentTodos => {
@@ -110,11 +116,19 @@ export const App: React.FC = () => {
         });
       })
       .catch(() => setErrorMessage('Unable to update a todo'))
-      .finally(() => setLoading(false));
+      .finally(() =>
+        setLoadingTodos(current => {
+          const newState = { ...current };
+
+          delete newState[selectedTodo.id];
+
+          return newState;
+        }),
+      );
   };
 
   const updateTitleTodo = (selectedTodo: Todo, newTitle: string) => {
-    setLoading(true);
+    setLoadingTodos(current => ({ ...current, [selectedTodo.id]: true }));
     patchTitleTodo(selectedTodo, newTitle)
       .then(newTodo => {
         setTodos(currentTodos => {
@@ -127,7 +141,15 @@ export const App: React.FC = () => {
         });
       })
       .catch(() => setErrorMessage('Unable to update a todo'))
-      .finally(() => setLoading(false));
+      .finally(() =>
+        setLoadingTodos(current => {
+          const newState = { ...current };
+
+          delete newState[selectedTodo.id];
+
+          return newState;
+        }),
+      );
   };
 
   const handleSubmit = (event: React.FormEvent) => {
@@ -194,7 +216,7 @@ export const App: React.FC = () => {
         <TodoList
           todos={filteredTodos}
           onDelete={deleteTodos}
-          isLoading={loading}
+          isLoading={loadingTodos}
           tempTodo={tempTodo}
           onUpdate={updateTodo}
           onUpdateTitle={updateTitleTodo}

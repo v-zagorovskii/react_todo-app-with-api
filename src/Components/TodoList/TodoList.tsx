@@ -7,7 +7,7 @@ import { TodoItem } from '../TodoItem/TodoItem';
 type Props = {
   todos: Todo[];
   onDelete: (v: number) => void;
-  isLoading: boolean;
+  isLoading: Record<number, boolean>;
   tempTodo?: Todo | null;
   onUpdate: (todo: Todo) => void;
   onUpdateTitle: (todo: Todo, newTitle: string) => void;
@@ -28,7 +28,7 @@ export const TodoList: React.FC<Props> = ({
           key={todo.id}
           todo={todo}
           onDelete={onDelete}
-          isLoading={isLoading}
+          isLoading={isLoading[todo.id] || false}
           onUpdate={onUpdate}
           onUpdateTitle={onUpdateTitle}
         />
